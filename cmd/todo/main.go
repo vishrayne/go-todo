@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
-	todo.Ping()
+	db := todo.Init()
+	todo.CreateTodo(db, "title_1", false)
 }
