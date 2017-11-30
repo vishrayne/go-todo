@@ -57,3 +57,19 @@ func (db *DataBase) save(value interface{}) {
 
 	db.gormDb.Save(value)
 }
+
+func (db *DataBase) find(value interface{}) {
+	if db == nil || !db.isConnected {
+		panic("database not open or initialized")
+	}
+
+	db.gormDb.Find(value)
+}
+
+func (db *DataBase) findBy(value interface{}, where ...interface{}) {
+	if db == nil || !db.isConnected {
+		panic("database not open or initialized")
+	}
+
+	db.gormDb.Find(value, where)
+}

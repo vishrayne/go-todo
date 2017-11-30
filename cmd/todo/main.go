@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
+
 	todo "github.com/vishrayne/go-todo/v1"
 )
 
 func main() {
-	db := todo.Init()
-	todo.CreateTodo(db, "title_1", false)
+	todoManager := todo.Init(true)
+	todoManager.CreateTodo("title_2", true)
+	fmt.Println(todoManager.GetAllTodo())
 }
