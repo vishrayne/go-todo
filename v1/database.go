@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	// sqlite driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -42,34 +44,64 @@ func (db *DataBase) close() {
 	db.gormDb.Close()
 }
 
-func (db *DataBase) autoMigrate() {
+func (db *DataBase) autoMigrate() error {
 	if db == nil || !db.isConnected {
-		panic("database not open or initialized")
+		return errors.New("database not open or initialized")
 	}
 
 	db.gormDb.AutoMigrate(&todoModel{})
+	return nil
 }
 
-func (db *DataBase) save(value interface{}) {
+func (db *DataBase) save(model interface{}) error {
 	if db == nil || !db.isConnected {
-		panic("database not open or initialized")
+		return errors.New("database not open or initialized")
 	}
 
-	db.gormDb.Save(value)
+	db.gormDb.Save(model)
+	return nil
 }
 
-func (db *DataBase) find(value interface{}) {
+func (db *DataBase) find(model interface{}) error {
 	if db == nil || !db.isConnected {
-		panic("database not open or initialized")
+		return errors.New("database not open or initialized")
 	}
 
-	db.gormDb.Find(value)
+	db.gormDb.Find(model)
+	return nil
 }
 
-func (db *DataBase) findBy(value interface{}, where ...interface{}) {
+func (db *DataBase) findBy(model interface{}, where ...interface{}) error {
 	if db == nil || !db.isConnected {
-		panic("database not open or initialized")
+		return errors.New("database not open or initialized")
 	}
 
-	db.gormDb.Find(value, where)
+	db.gormDb.Find(model, where)
+	return nil
+}
+
+func (db *DataBase) updateAttributes(model interface{}, attrs map[string]interface{}) error {
+	if db == nil || !db.isConnected {
+		return errors.New("database not open or initialized")
+	}
+
+	if len(attrs) <= 0 {
+		return errors.New("nothing to update")
+	}
+
+	for key, value := range attrs {
+		db.gormDb.Model(model).Update(key, value)
+	}
+
+	return nil
+}
+
+func (db *DataBase) delete(model interface{}) error {
+	if db == nil || !db.isConnected {
+		return errors.New("database not open or initialized")
+	}
+
+	db.gormDb.Delete(model)
+
+	return nil
 }

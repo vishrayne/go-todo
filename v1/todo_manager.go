@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -65,4 +66,51 @@ func (t *TodoManager) GetAllTodo() []ResponseTodo {
 	}
 
 	return responseTodos
+}
+
+// FindTodo updates a given todo
+func (t *TodoManager) FindTodo(todoID uint) (ResponseTodo, error) {
+	var todo todoModel
+	t.database.findBy(&todo, "id = ?", todoID)
+
+	if todo.ID == 0 {
+		return ResponseTodo{}, errors.New("no record found")
+	}
+
+	return ResponseTodo{
+		ID:        todo.ID,
+		Title:     todo.Title,
+		Completed: todo.Completed,
+		Created:   todo.CreatedAt,
+	}, nil
+}
+
+// UpdateTodo updates the given todo
+func (t *TodoManager) UpdateTodo(todoID uint, title string, completed bool) (uint, error) {
+	var todo todoModel
+	t.database.findBy(&todo, "id = ?", todoID)
+
+	if todo.ID == 0 {
+		return 0, errors.New("no record found")
+	}
+
+	attrs := make(map[string]interface{})
+	attrs["title"] = title
+	attrs["completed"] = completed
+
+	t.database.updateAttributes(&todo, attrs)
+	return todoID, nil
+}
+
+// DeleteTodo deletes the given todo
+func (t *TodoManager) DeleteTodo(todoID uint) error {
+	var todo todoModel
+	t.database.findBy(&todo, "id = ?", todoID)
+
+	if todo.ID == 0 {
+		return errors.New("no record found")
+	}
+
+	t.database.delete(&todo)
+	return nil
 }
