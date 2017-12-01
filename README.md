@@ -14,9 +14,18 @@ I would recommend to use atom|go-plus combo to build/hack this if you are new to
 ```
 $ dep ensure
 ```
-3. go build `github.com/vishrayne/go-todo/cmd/todo` or `github.com/vishrayne/go-todo/cmd/todo-server`
-4. go install `<which ever component you have built>`
-5. `$ todo <or> todo-server`
+## Build
+### todo utility demo
+1. `$ go build github.com/vishrayne/go-todo/cmd/todo`
+2. `$ go install github.com/vishrayne/go-todo/cmd/todo`
+3. `$ todo`
+
+### todo-server demo
+1. `$ go build github.com/vishrayne/go-todo/cmd/todo-server`
+2. `$ go install github.com/vishrayne/go-todo/cmd/todo-server`
+3. `$ todo-server`
+4. visit localhost:8080 on your browser
+5. CRUD endpoints are available under `/api/v1/todos`, check your terminal for more details.
 
 
 TODO: clean up around todo-server
