@@ -33,7 +33,7 @@ func main() {
 
 func todoMiddleware() gin.HandlerFunc {
 	// one-time initialization
-	todoManager := todo.Init(true)
+	todoManager := todo.Init(true, "data/gorm.db")
 
 	return func(c *gin.Context) {
 		c.Set(todoManagerKey, todoManager)

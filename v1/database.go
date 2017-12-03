@@ -10,8 +10,9 @@ import (
 
 // DataBase handler
 type DataBase struct {
-	gormDb      *gorm.DB
-	isConnected bool
+	gormDb       *gorm.DB
+	databasePath string
+	isConnected  bool
 }
 
 type todoModel struct {
@@ -20,12 +21,14 @@ type todoModel struct {
 	Completed bool   `json:"completed"`
 }
 
-func newDatabase() *DataBase {
-	return &DataBase{}
+func newDatabase(databasePath string) *DataBase {
+	return &DataBase{
+		databasePath: databasePath,
+	}
 }
 
 func (db *DataBase) open() error {
-	database, err := gorm.Open("sqlite3", "data/gorm.db")
+	database, err := gorm.Open("sqlite3", db.databasePath)
 	if err != nil {
 		return err
 	}

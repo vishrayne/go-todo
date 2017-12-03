@@ -7,21 +7,23 @@ import (
 )
 
 //TodoManager representation
-type TodoManager struct {
-	database *DataBase
-}
+type (
+	TodoManager struct {
+		database *DataBase
+	}
 
-// ResponseTodo - sanitized response format
-type ResponseTodo struct {
-	ID        uint   `json:"id"`
-	Title     string `json:"title"`
-	Completed bool   `json:"completed"`
-	Created   time.Time
-}
+	// ResponseTodo - sanitized response format
+	ResponseTodo struct {
+		ID        uint   `json:"id"`
+		Title     string `json:"title"`
+		Completed bool   `json:"completed"`
+		Created   time.Time
+	}
+)
 
 // Init todo manager
-func Init(shouldAutoMigrate bool) *TodoManager {
-	db := newDatabase()
+func Init(shouldAutoMigrate bool, databasePath string) *TodoManager {
+	db := newDatabase(databasePath)
 	err := db.open()
 	if err != nil {
 		fmt.Println(err)

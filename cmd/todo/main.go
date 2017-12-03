@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	todoManager := todo.Init(true)
+	todoManager := todo.Init(true, "data/gorm.db")
 
 	id := todoManager.CreateTodo("title_1", true)
 	//show all todo
