@@ -1,4 +1,5 @@
 # go-todo
+[![baby-gopher](https://raw.githubusercontent.com/drnic/babygopher-site/gh-pages/images/babygopher-logo-small.png)](http://www.babygopher.org)
 
 A simple todo utility/server written in golang. Run the todo script under **cmd/todo**.
 Also a minimal JSON API is also available at **cmd/todo-server**, which will be written in [gin](https://github.com/gin-gonic/gin) framework.
