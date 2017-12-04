@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	todo "github.com/vishrayne/go-todo/v1"
+	todo "github.com/vishrayne/go-todo"
 )
 
 const todoManagerKey string = "todo_manager_key"
@@ -33,7 +33,7 @@ func main() {
 
 func todoMiddleware() gin.HandlerFunc {
 	// one-time initialization
-	todoManager := todo.Init(true, "data/gorm.db")
+	todoManager := todo.Init(todo.DebugMode, true)
 
 	return func(c *gin.Context) {
 		c.Set(todoManagerKey, todoManager)
@@ -51,7 +51,7 @@ func pingHandler(c *gin.Context) {
 
 func showAllTodoHandler(c *gin.Context) {
 	todoManager := c.MustGet(todoManagerKey).(*todo.TodoManager)
-	c.JSON(http.StatusOK, gin.H{"data": todoManager.GetAllTodo()})
+	c.JSON(http.StatusOK, gin.H{"data": todoManager.GetAll()})
 }
 
 // TODO: cleanup
@@ -66,7 +66,7 @@ func createTodoHandler(c *gin.Context) {
 		completed = false
 	}
 
-	id := todoManager.CreateTodo(title, completed)
+	id := todoManager.Create(title, completed)
 	c.JSON(http.StatusCreated, gin.H{"message": "todo created", "id": id})
 }
 
@@ -81,7 +81,7 @@ func showTodoHandler(c *gin.Context) {
 		return
 	}
 
-	activeTodo, err := todoManager.FindTodo(uint(todoID))
+	activeTodo, err := todoManager.Find(uint(todoID))
 	if err != nil {
 		log.Printf("error fetching todo with id[%d] -> %v", todoID, err)
 		c.JSON(http.StatusNotFound, gin.H{"data": "", "error": err.Error()})
@@ -112,7 +112,7 @@ func updateTodoHandler(c *gin.Context) {
 		return
 	}
 
-	_, err = todoManager.UpdateTodo(uint(todoID), title, completed)
+	_, err = todoManager.Update(uint(todoID), title, completed)
 	if err != nil {
 		log.Printf("updating todo[%d] failed -> %v", todoID, err)
 		c.JSON(http.StatusOK, gin.H{"data": "", "error": err.Error()})
@@ -134,7 +134,7 @@ func deleteTodoHandler(c *gin.Context) {
 		return
 	}
 
-	err = todoManager.DeleteTodo(uint(todoID))
+	err = todoManager.Delete(uint(todoID))
 	if err != nil {
 		log.Printf("error removing todo[%d] -> %v", todoID, err)
 		c.JSON(http.StatusOK, gin.H{"data": "", "error": err.Error()})

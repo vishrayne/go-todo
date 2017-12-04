@@ -1,4 +1,4 @@
-package v1
+package todo
 
 import (
 	"errors"
@@ -106,5 +106,14 @@ func (db *DataBase) delete(model interface{}) error {
 
 	db.gormDb.Delete(model)
 
+	return nil
+}
+
+func (db *DataBase) deleteAll(model interface{}) error {
+	if db == nil || !db.isConnected {
+		return errors.New("database not open or initialized")
+	}
+
+	db.gormDb.Model(model).Delete(model)
 	return nil
 }

@@ -1,15 +1,26 @@
-package v1
+package todo
 
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"time"
+
+	toml "github.com/pelletier/go-toml"
 )
 
-//TodoManager representation
+const (
+	DebugMode   string = "dev"
+	ReleaseMode string = "prod"
+	TestMode    string = "test"
+)
+
 type (
-	TodoManager struct {
+	//Manager representation
+	Manager struct {
+		mode     string
 		database *DataBase
+		config   *toml.Tree
 	}
 
 	// ResponseTodo - sanitized response format
@@ -22,7 +33,27 @@ type (
 )
 
 // Init todo manager
-func Init(shouldAutoMigrate bool, databasePath string) *TodoManager {
+func Init(appMode string, shouldAutoMigrate bool) *Manager {
+	mode := DebugMode
+	switch appMode {
+	case DebugMode:
+		mode = DebugMode
+	case ReleaseMode:
+		mode = ReleaseMode
+	case TestMode:
+		mode = TestMode
+	default:
+		panic("app mode unknown: " + appMode)
+	}
+
+	path, _ := filepath.Abs(".")
+	absPath := filepath.Join(path, "config", "settings.toml")
+	config, _ := toml.LoadFile(absPath)
+
+	databaseConfig := config.Get("database").(*toml.Tree)
+	databaseEnv := databaseConfig.Get(mode).(*toml.Tree)
+	databasePath := filepath.Join(path, "data", databaseEnv.Get("name").(string))
+
 	db := newDatabase(databasePath)
 	err := db.open()
 	if err != nil {
@@ -33,13 +64,15 @@ func Init(shouldAutoMigrate bool, databasePath string) *TodoManager {
 		db.autoMigrate()
 	}
 
-	return &TodoManager{
+	return &Manager{
 		database: db,
+		mode:     mode,
+		config:   config,
 	}
 }
 
-// CreateTodo creates a todo with given title and completed flag.
-func (t *TodoManager) CreateTodo(title string, completed bool) uint {
+// Create creates a todo with given title and completed flag.
+func (t *Manager) Create(title string, completed bool) uint {
 	todo := todoModel{
 		Title:     title,
 		Completed: completed,
@@ -49,8 +82,8 @@ func (t *TodoManager) CreateTodo(title string, completed bool) uint {
 	return todo.ID
 }
 
-// GetAllTodo returns all stored todo records.
-func (t *TodoManager) GetAllTodo() []ResponseTodo {
+// GetAll returns all stored todo records.
+func (t *Manager) GetAll() []ResponseTodo {
 	var todos []todoModel
 	t.database.find(&todos)
 
@@ -70,8 +103,8 @@ func (t *TodoManager) GetAllTodo() []ResponseTodo {
 	return responseTodos
 }
 
-// FindTodo updates a given todo
-func (t *TodoManager) FindTodo(todoID uint) (ResponseTodo, error) {
+// Find updates a given todo
+func (t *Manager) Find(todoID uint) (ResponseTodo, error) {
 	var todo todoModel
 	t.database.findBy(&todo, "id = ?", todoID)
 
@@ -87,8 +120,8 @@ func (t *TodoManager) FindTodo(todoID uint) (ResponseTodo, error) {
 	}, nil
 }
 
-// UpdateTodo updates the given todo
-func (t *TodoManager) UpdateTodo(todoID uint, title string, completed bool) (uint, error) {
+// Update updates the given todo
+func (t *Manager) Update(todoID uint, title string, completed bool) (uint, error) {
 	var todo todoModel
 	t.database.findBy(&todo, "id = ?", todoID)
 
@@ -104,8 +137,8 @@ func (t *TodoManager) UpdateTodo(todoID uint, title string, completed bool) (uin
 	return todoID, nil
 }
 
-// DeleteTodo deletes the given todo
-func (t *TodoManager) DeleteTodo(todoID uint) error {
+// Delete deletes the given todo
+func (t *Manager) Delete(todoID uint) error {
 	var todo todoModel
 	t.database.findBy(&todo, "id = ?", todoID)
 
@@ -115,4 +148,9 @@ func (t *TodoManager) DeleteTodo(todoID uint) error {
 
 	t.database.delete(&todo)
 	return nil
+}
+
+// DeleteAll deletes everything
+func (t *Manager) DeleteAll() {
+	t.database.deleteAll(&todoModel{})
 }

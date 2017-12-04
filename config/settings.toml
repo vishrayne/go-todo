@@ -1,0 +1,7 @@
+[database]
+  [database.dev]
+    name = "gorm_dev.db"
+  [database.prod]
+    name = "gorm_prod.db"
+  [database.test]
+    name = "gorm_test.db"
