@@ -15,6 +15,24 @@ func setup(t *testing.T) (*Manager, func(t *testing.T)) {
 	}
 }
 
+func TestInit(t *testing.T) {
+	defer func() {
+		want := "app mode unknown: UNKNOWN_MODE"
+		r := recover()
+		if r == nil {
+			t.Errorf("The code did not panic for an unknown mode")
+		}
+
+		if errString, ok := r.(string); ok {
+			if errString != want {
+				t.Errorf("expected error %s but got %s", want, errString)
+			}
+		}
+	}()
+
+	Init("UNKNOWN_MODE", false)
+}
+
 func TestCreate(t *testing.T) {
 	todoManager, tearDown := setup(t)
 	defer tearDown(t)
@@ -40,6 +58,16 @@ func TestCreate(t *testing.T) {
 				t.Errorf("expected todo completed as %t but got todo => %t", tc.done, todo.Completed)
 			}
 		})
+	}
+}
+
+func TestGetAll_Empty(t *testing.T) {
+	todoManager, tearDown := setup(t)
+	defer tearDown(t)
+
+	todos := todoManager.GetAll()
+	if len(todos) != 0 {
+		t.Errorf("Expected 0 todos but got %d", len(todos))
 	}
 }
 

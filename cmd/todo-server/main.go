@@ -50,13 +50,13 @@ func pingHandler(c *gin.Context) {
 }
 
 func showAllTodoHandler(c *gin.Context) {
-	todoManager := c.MustGet(todoManagerKey).(*todo.TodoManager)
+	todoManager := c.MustGet(todoManagerKey).(*todo.Manager)
 	c.JSON(http.StatusOK, gin.H{"data": todoManager.GetAll()})
 }
 
 // TODO: cleanup
 func createTodoHandler(c *gin.Context) {
-	todoManager := c.MustGet(todoManagerKey).(*todo.TodoManager)
+	todoManager := c.MustGet(todoManagerKey).(*todo.Manager)
 	title := c.PostForm("title")
 	done := c.PostForm("done")
 
@@ -72,7 +72,7 @@ func createTodoHandler(c *gin.Context) {
 
 // TODO: cleanup
 func showTodoHandler(c *gin.Context) {
-	todoManager := c.MustGet(todoManagerKey).(*todo.TodoManager)
+	todoManager := c.MustGet(todoManagerKey).(*todo.Manager)
 	id := c.Param("id")
 	todoID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
@@ -93,7 +93,7 @@ func showTodoHandler(c *gin.Context) {
 
 // TODO: cleanup
 func updateTodoHandler(c *gin.Context) {
-	todoManager := c.MustGet(todoManagerKey).(*todo.TodoManager)
+	todoManager := c.MustGet(todoManagerKey).(*todo.Manager)
 	id := c.Param("id")
 	title := c.PostForm("title")
 	done := c.PostForm("done")
@@ -124,7 +124,7 @@ func updateTodoHandler(c *gin.Context) {
 
 // TODO: cleanup
 func deleteTodoHandler(c *gin.Context) {
-	todoManager := c.MustGet(todoManagerKey).(*todo.TodoManager)
+	todoManager := c.MustGet(todoManagerKey).(*todo.Manager)
 	id := c.Param("id")
 
 	todoID, err := strconv.ParseUint(id, 10, 32)

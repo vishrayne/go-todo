@@ -37,11 +37,9 @@ func Init(appMode string, shouldAutoMigrate bool) *Manager {
 	mode := DebugMode
 	switch appMode {
 	case DebugMode:
-		mode = DebugMode
 	case ReleaseMode:
-		mode = ReleaseMode
 	case TestMode:
-		mode = TestMode
+		mode = appMode
 	default:
 		panic("app mode unknown: " + appMode)
 	}
@@ -88,7 +86,7 @@ func (t *Manager) GetAll() []ResponseTodo {
 	t.database.find(&todos)
 
 	if len(todos) <= 0 {
-		return nil
+		return []ResponseTodo{}
 	}
 
 	var responseTodos []ResponseTodo
