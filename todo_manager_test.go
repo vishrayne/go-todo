@@ -88,3 +88,16 @@ func TestUpdate(t *testing.T) {
 		t.Errorf("expected todo completed as %t but got todo => %t", wantCompleted, updatedTodo.Completed)
 	}
 }
+
+func TestDelete(t *testing.T) {
+	todoManager, tearDown := setup(t)
+	defer tearDown(t)
+
+	id := todoManager.Create("title", true)
+	todoManager.Delete(id)
+	todo, err := todoManager.Find(id)
+
+	if err == nil {
+		t.Errorf("expected no todo for id:%d but got %v", id, todo)
+	}
+}
